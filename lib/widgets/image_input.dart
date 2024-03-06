@@ -1,30 +1,35 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageInput extends StatefulWidget {
-  const ImageInput({super.key});
+  const ImageInput({super.key, required this.onSelectImage});
+
+  final void Function(File img) onSelectImage;
 
   @override
-  State<StatefulWidget> createState() {
-    return _ImageInputState();
-  }
+  State<ImageInput> createState() => _ImageInputState();
 }
 
 class _ImageInputState extends State<ImageInput> {
   File? _selectedImage;
 
   void _takePicture() async {
-    final img = await ImagePicker().pickImage(source: ImageSource.camera);
+    try {
+      final pickedImg = ImagePicker();
+      final img =
+          await pickedImg.pickImage(source: ImageSource.camera, maxWidth: 500);
 
-    if (img == null) {
-      return;
+      if (img == null) return;
+
+      setState(() {
+        _selectedImage = File(img.path);
+      });
+
+      widget.onSelectImage(_selectedImage!);
+    } catch (e) {
+      print(e);
     }
-
-    setState(() {
-      _selectedImage = File(img.path);
-    });
   }
 
   @override
@@ -34,17 +39,20 @@ class _ImageInputState extends State<ImageInput> {
       icon: const Icon(Icons.camera),
       label: const Text('Take Picture'),
       style: TextButton.styleFrom(
-        backgroundColor: Theme.of(context).colorScheme.onSecondary,
+        foregroundColor: Theme.of(context).colorScheme.onBackground,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.zero),
         ),
       ),
     );
     if (_selectedImage != null) {
-      content = Image.file(
-        _selectedImage!,
-        fit: BoxFit.cover,
-        width: double.infinity,
+      content = GestureDetector(
+        onTap: _takePicture,
+        child: Image.file(
+          _selectedImage!,
+          fit: BoxFit.cover,
+          width: double.infinity,
+        ),
       );
     }
     return Container(
@@ -53,7 +61,7 @@ class _ImageInputState extends State<ImageInput> {
               width: 2,
               color: Theme.of(context).colorScheme.primary.withOpacity(0.3)),
         ),
-        height: 250,
+        height: 200,
         width: double.infinity,
         child: content);
   }
