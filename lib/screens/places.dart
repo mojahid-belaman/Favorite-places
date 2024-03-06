@@ -22,8 +22,11 @@ class Places extends ConsumerWidget {
     );
 
     if (places.isNotEmpty) {
-      content = PlaceList(
-        places: places,
+      content = Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: PlaceList(
+          places: places,
+        ),
       );
     }
     return Scaffold(
