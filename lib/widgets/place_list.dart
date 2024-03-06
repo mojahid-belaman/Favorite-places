@@ -13,6 +13,11 @@ class PlaceList extends StatelessWidget {
     return ListView.builder(
       itemCount: places.length,
       itemBuilder: (ctx, index) => ListTile(
+        contentPadding: const EdgeInsets.all(10),
+        leading: CircleAvatar(
+          radius: 25,
+          backgroundImage: FileImage(places[index].image!),
+        ),
         title: Text(
           places[index].title,
           style: ThemeData()
